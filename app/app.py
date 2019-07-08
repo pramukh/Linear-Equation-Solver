@@ -17,7 +17,7 @@ import time
 # sess = tf.Session(config=config)
 
 # Load in the saved neural network
-model = load_model('saved_model2.h5')
+model = load_model('saved_model.h5')
 labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '*',
           '/', '=']
 
