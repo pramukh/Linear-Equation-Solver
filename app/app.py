@@ -2,11 +2,11 @@ from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from keras.models import load_model
 import tensorflow as tf
-import matplotlib.pyplot as plt
 import numpy as np
-from keras import backend
-from tensorflow.python.client import device_lib
-import time
+import cv2 as cv
+from copy import deepcopy
+from itertools import combinations
+import base64
 
 # assert 'GPU' in str(device_lib.list_local_devices())
 #
@@ -16,22 +16,21 @@ import time
 # config.gpu_options.allow_growth=True
 # sess = tf.Session(config=config)
 
+# gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.333)
+# sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
+
+
 # Load in the saved neural network
-model = load_model('saved_model.h5')
+model = load_model('saved_model2.h5')
 labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '*',
           '/', '=']
 
 # Setting up the Flask app
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # Allow Cross-Origin Resource Sharing
-# cors = CORS(app)
-
-import cv2 as cv
-import numpy as np
-from copy import deepcopy
-from itertools import combinations
-import base64
+cors = CORS(app)
 
 graph = tf.get_default_graph()
 
@@ -74,7 +73,6 @@ def preprocess(image):
     contours = sorted(contours, key=lambda ctr: cv.boundingRect(ctr)[0])
     rects = [cv.boundingRect(ctr) for ctr in contours]
 
-    print(rects)
     new_rects = []
     pad = 2
     for rect in rects:
@@ -193,6 +191,10 @@ def api_predict_from_dataurl():
 
     final_symbols = preprocess(imgstring)
 
+    if len(final_symbols) == 0:
+        print('empty')
+        return ''
+
     final_symbols = np.asarray(final_symbols).reshape(-1, 47, 47, 1)
 
     with graph.as_default():
@@ -204,8 +206,12 @@ def api_predict_from_dataurl():
         predicted_symbols.pop()
 
     print(predicted_symbols)
+    expression = ''.join(predicted_symbols)
+    try:
+        answer = expression + ' = ' + str(eval(expression))
+    except SyntaxError:
+        answer = expression + ' is ' + 'Invalid'
 
-    answer = eval(''.join(predicted_symbols))
 
     # Convert to OpenCV image
 
@@ -217,5 +223,5 @@ def api_predict_from_dataurl():
 if __name__ == '__main__':
     from os import environ
 
-    # app.run(debug=False, port=environ.get("PORT", 5000), host='0.0.0.0')
-    app.run(debug=False)
+    app.run(debug=False, port=environ.get("PORT", 5000), host='127.0.0.1')
+

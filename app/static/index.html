@@ -8,25 +8,27 @@
 <body>
 
 
-<center><h1>Draw the equation</h1></center>
+<center><h1>Draw a equation</h1></center>
 <div
         style="width: 1080px; margin: 0 auto; justify-content: center">
 
     <canvas width="1080" height="280" id="canvas"
-            style="border:1px solid black;">canvas
+            style="border:1px solid black;">
     </canvas>
 </div>
 
 <div style="justify-content: center; align-items: center; margin: 3% 20%;">
-    <div style="width: 330px; height: 400px; float: left; position:relative">
-        <input type="button" onclick="uploadEx()" value="Calculate"
-               style="width: 50%; position:absolute; top: 30%; left: 25%"/>
-        <input type="button" onclick="clearCanvas()" value="Clear"
-               style="width: 50%; position:absolute; top: 50%; left: 25%"/>
-    </div>
-
     <div
-            style="width: 280px; height: 280px; float:left; border:1px solid black; font-size: 280px; line-height: 280px; text-align: center">
+            style="display: flex; width: auto; height: 100%;">
+        <input type="button" onclick="uploadEx()" value="Calculate"
+               style="width: 50%; height: auto;"/>
+        <input type="button" onclick="clearCanvas()" value="Clear"
+               style="width: 50%;height: auto;"/>
+    </div>
+</div>
+<div style="justify-content: center; align-items: center; margin: 3% 20%;">
+    <div
+            style="margin: 10% auto; width: 100%; height: 80px; border:1px solid black; font-size: 60px; line-height: 80px; text-align: center">
         <span id="num" style=""></span>
     </div>
 </div>
@@ -67,7 +69,7 @@
             }
 
             /* Drawing on Paint App */
-            ctx.lineWidth = 5;
+            ctx.lineWidth = 2;
             ctx.lineJoin = 'round';
             ctx.lineCap = 'round';
             ctx.strokeStyle = 'black';
@@ -98,17 +100,18 @@
             }
 
 
+
 </script>
 
 <div>
-
+<form method="post" accept-charset="utf-8"
+                                      name="form1">
+    <input name="data" id='data' type="hidden"/>
+    </form>
 </div>
 
-<form method="post" accept-charset="utf-8" name="form1">
-    <input name="data" id='data' type="hidden"/>
-</form>
 
-         <script>
+<script>
            function uploadEx() {
                 var canvas = document.getElementById("canvas");
                 var dataURL = canvas.toDataURL("image/png");
@@ -130,6 +133,7 @@
                 };
                 xhr.send(fd);
             };
-        </script>
+
+</script>
 </body>
 </html>
