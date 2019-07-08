@@ -6,10 +6,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 from keras import backend
 from tensorflow.python.client import device_lib
+import time
 
-assert 'GPU' in str(device_lib.list_local_devices())
+# assert 'GPU' in str(device_lib.list_local_devices())
+#
+# assert len(backend.tensorflow_backend._get_available_gpus()) > 0
 
-assert len(backend.tensorflow_backend._get_available_gpus()) > 0
+# config = tf.ConfigProto()
+# config.gpu_options.allow_growth=True
+# sess = tf.Session(config=config)
 
 # Load in the saved neural network
 model = load_model('saved_model2.h5')
@@ -20,7 +25,7 @@ labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '*',
 app = Flask(__name__)
 
 # Allow Cross-Origin Resource Sharing
-cors = CORS(app)
+# cors = CORS(app)
 
 import cv2 as cv
 import numpy as np
@@ -55,8 +60,8 @@ def rect_area(rect):
         return 0
 
 
-def preprocess(img):
-    img = data_uri_to_cv2_img(img)
+def preprocess(image):
+    img = data_uri_to_cv2_img(image)
     gray = img.copy()
     blurred = cv.GaussianBlur(gray, (5, 5), 5)
     thresh = cv.adaptiveThreshold(blurred, 255, 0, 1, 115, 1)
@@ -69,8 +74,7 @@ def preprocess(img):
     contours = sorted(contours, key=lambda ctr: cv.boundingRect(ctr)[0])
     rects = [cv.boundingRect(ctr) for ctr in contours]
 
-    rects
-
+    print(rects)
     new_rects = []
     pad = 2
     for rect in rects:
@@ -199,12 +203,14 @@ def api_predict_from_dataurl():
     if predicted_symbols[-1] == '=':
         predicted_symbols.pop()
 
+    print(predicted_symbols)
+
     answer = eval(''.join(predicted_symbols))
 
     # Convert to OpenCV image
 
     # Return the prediction
-    return answer
+    return str(answer)
 
 
 # Start flask app
@@ -212,4 +218,4 @@ if __name__ == '__main__':
     from os import environ
 
     # app.run(debug=False, port=environ.get("PORT", 5000), host='0.0.0.0')
-    app.run(debug=True)
+    app.run(debug=False)
