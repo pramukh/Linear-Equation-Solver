@@ -1,12 +1,13 @@
+import base64
+from copy import deepcopy
+from itertools import combinations
+
+import cv2 as cv
+import numpy as np
+import tensorflow as tf
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from keras.models import load_model
-import tensorflow as tf
-import numpy as np
-import cv2 as cv
-from copy import deepcopy
-from itertools import combinations
-import base64
 
 # assert 'GPU' in str(device_lib.list_local_devices())
 #
@@ -20,16 +21,13 @@ import base64
 # sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
 
-# Load in the saved neural network
 model = load_model('saved_model2.h5')
 labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '*',
           '/', '=']
 
-# Setting up the Flask app
 app = Flask(__name__, static_url_path='/static')
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-# Allow Cross-Origin Resource Sharing
 cors = CORS(app)
 
 graph = tf.get_default_graph()
@@ -111,7 +109,7 @@ def preprocess(image):
     for (x, y, w, h) in final_rects:
         extracted_rects.append(
             dilation.copy()[y - pad: y + h + pad, x - pad: x + w + pad])
-        rect = cv.rectangle(output_img, (x, y), (x + w, y + h), (0, 0, 255), 3)
+        # rect = cv.rectangle(output_img, (x, y), (x + w, y + h), (0, 0, 255), 3)
 
     final_extracted_rects = []
     pad = 0
@@ -163,20 +161,11 @@ def preprocess(image):
 
 
 def data_uri_to_cv2_img(uri):
-    """
-    Convert a data URL to an OpenCV image
-    Credit: https://stackoverflow.com/a/54205640/2415512
-    : param uri : data URI representing a BW image
-    : returns   : OpenCV image
-    """
-
     encoded_data = uri.split(',')[1]
     nparr = np.fromstring(base64.b64decode(encoded_data), np.uint8)
     img = cv.imdecode(nparr, cv.IMREAD_GRAYSCALE)
     return img
 
-
-# Serve a canvas interface on /
 
 @app.route('/')
 def api_root():
@@ -186,7 +175,6 @@ def api_root():
 @app.route('/post-data-url', methods=['POST'])
 @cross_origin()
 def api_predict_from_dataurl():
-    # Read the image data from a base64 data URL
     imgstring = request.form.get('data')
 
     final_symbols = preprocess(imgstring)
@@ -212,10 +200,6 @@ def api_predict_from_dataurl():
     except SyntaxError:
         answer = expression + ' is ' + 'Invalid'
 
-
-    # Convert to OpenCV image
-
-    # Return the prediction
     return str(answer)
 
 
@@ -223,5 +207,4 @@ def api_predict_from_dataurl():
 if __name__ == '__main__':
     from os import environ
 
-    app.run(debug=False, port=environ.get("PORT", 5000), host='127.0.0.1')
-
+    app.run(debug=False, port=environ.get('PORT', 5000), host='0.0.0.0')
