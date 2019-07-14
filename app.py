@@ -26,7 +26,7 @@ labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '*',
           '/', '=', '(', ')']
 
 app = Flask(__name__, static_url_path='/static')
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+# app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 cors = CORS(app)
 
@@ -59,7 +59,7 @@ def rect_area(rect):
 
 def preprocess(image):
     img = data_uri_to_cv2_img(image)
-    
+
     gray = img.copy()
     blurred = cv.GaussianBlur(gray, (5, 5), 5)
     thresh = cv.adaptiveThreshold(blurred, 255, 0, 1, 115, 1)
