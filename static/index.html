@@ -12,7 +12,7 @@
 <div
         style="width: 1080px; margin: 0 auto; justify-content: center">
 
-    <canvas width="1080" height="280" id="canvas"
+    <canvas width="1080" height="120" id="canvas"
             style="border:1px solid black;">
     </canvas>
 </div>
@@ -56,7 +56,7 @@
             window.onload = function() {
                 var canvas = document.getElementById("canvas");
                 var context = canvas.getContext("2d");
-                context.rect(0, 0, 1080, 280);
+                context.rect(0, 0, 1080, 120);
                 context.fillStyle = 'white';
                 context.fill();
             }
@@ -87,7 +87,7 @@
                 var canvas = document.getElementById("canvas");
                 var context = canvas.getContext("2d");
                 context.clearRect(0, 0, canvas.width, canvas.height);
-                context.rect(0, 0, 1080, 280);
+                context.rect(0, 0, 1080, 120);
                 context.fillStyle = 'white';
                 context.fill();
             }

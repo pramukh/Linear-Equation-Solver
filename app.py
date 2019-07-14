@@ -21,9 +21,9 @@ from keras.models import load_model
 # sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
 
-model = load_model('saved_model2.h5')
+model = load_model('saved_model.h5')
 labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '*',
-          '/', '=']
+          '/', '=', '(', ')']
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -59,6 +59,7 @@ def rect_area(rect):
 
 def preprocess(image):
     img = data_uri_to_cv2_img(image)
+    
     gray = img.copy()
     blurred = cv.GaussianBlur(gray, (5, 5), 5)
     thresh = cv.adaptiveThreshold(blurred, 255, 0, 1, 115, 1)
@@ -98,15 +99,18 @@ def preprocess(image):
             try:
                 if area_common == area1 or area_common == area2:
                     final_rects.remove(combination[-1])
-                if area_common > area1 / 2 and area_common > area2 / 2:
+                if area_common > area1 / 2 or area_common > area2 / 2:
                     final_rects.remove(combination[-1])
             except ValueError:
                 pass
 
-    output_img = img.copy()
     extracted_rects = []
     pad = 1
     for (x, y, w, h) in final_rects:
+        x = max(pad, x)
+        y = max(pad, y)
+        w = min(img.shape[1] - pad, w)
+        h = min(img.shape[0] - pad, h)
         extracted_rects.append(
             dilation.copy()[y - pad: y + h + pad, x - pad: x + w + pad])
         # rect = cv.rectangle(output_img, (x, y), (x + w, y + h), (0, 0, 255), 3)
@@ -180,7 +184,6 @@ def api_predict_from_dataurl():
     final_symbols = preprocess(imgstring)
 
     if len(final_symbols) == 0:
-        print('empty')
         return ''
 
     final_symbols = np.asarray(final_symbols).reshape(-1, 47, 47, 1)
@@ -190,10 +193,10 @@ def api_predict_from_dataurl():
 
     predicted_symbols = [labels[i] for i in model_predictions]
 
-    if predicted_symbols[-1] == '=':
-        predicted_symbols.pop()
 
-    print(predicted_symbols)
+    if predicted_symbols[-1] == '=':
+        predicted_symbols.pop(-1)
+
     expression = ''.join(predicted_symbols)
     try:
         answer = expression + ' = ' + str(eval(expression))
@@ -203,8 +206,7 @@ def api_predict_from_dataurl():
     return str(answer)
 
 
-# Start flask app
 if __name__ == '__main__':
     from os import environ
 
-    app.run(debug=False, port=environ.get('PORT', 5000), host='0.0.0.0')
+    app.run(debug=False, port=environ.get('PORT', 5000), host='127.0.0.1')
