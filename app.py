@@ -30,8 +30,8 @@ labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '*',
           '/', '=', '(', ')']
 
 app = Flask(__name__, static_url_path='/static')
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-cors = CORS(app)
+# app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+CORS(app)
 
 # @app.after_request
 # def after_request(response):
@@ -211,7 +211,7 @@ def api_predict_from_dataurl():
         answer = expression + ' = ' + str(round(eval(expression), 4))
 
     except ZeroDivisionError:
-        answer = expression + ' Division by Error'
+        answer = expression + ' Division by Zero Error'
 
     except SyntaxError:
         answer = expression + ' is ' + 'Invalid'
