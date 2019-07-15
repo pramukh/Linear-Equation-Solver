@@ -10,4 +10,4 @@ The app can be found at [https://linear-equation-solver.herokuapp.com/](https://
 
 A demo window is shown below
 
-![Demo image](Browser_demo.png "Demo")
+![Demo image](Browser_demo.PNG "Demo")
