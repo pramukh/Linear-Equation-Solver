@@ -6,7 +6,7 @@ import cv2 as cv
 import numpy as np
 import tensorflow as tf
 from flask import Flask, request
-from flask_cors import CORS, cross_origin
+# from flask_cors import CORS, cross_origin
 from keras.models import load_model
 
 # from datetime import timedelta
@@ -31,14 +31,14 @@ labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '*',
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-cors = CORS(app)
+# cors = CORS(app)
 
-@app.after_request
-def after_request(response):
-  response.headers.add('Access-Control-Allow-Origin', '*')
-  response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-  response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-  return response
+# @app.after_request
+# def after_request(response):
+#   response.headers.add('Access-Control-Allow-Origin', '*')
+#   response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+#   response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+#   return response
 
 graph = tf.get_default_graph()
 
@@ -244,7 +244,7 @@ def api_root():
 
 
 @app.route('/post-data-url', methods=['POST'])
-@cross_origin()
+# @cross_origin()
 def api_predict_from_dataurl():
     imgstring = request.form.get('data')
 
