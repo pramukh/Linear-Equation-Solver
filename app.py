@@ -200,6 +200,10 @@ def api_predict_from_dataurl():
     expression = ''.join(predicted_symbols)
     try:
         answer = expression + ' = ' + str(eval(expression))
+
+    except ZeroDivisionError:
+        answer = expression + ' Division by Error'
+
     except SyntaxError:
         answer = expression + ' is ' + 'Invalid'
 
@@ -209,4 +213,4 @@ def api_predict_from_dataurl():
 if __name__ == '__main__':
     from os import environ
 
-    app.run(debug=False, port=environ.get('PORT', 5000), host='0.0.0.0')
+    app.run(debug=False, port=environ.get('PORT', 5000), host='127.0.0.1')
