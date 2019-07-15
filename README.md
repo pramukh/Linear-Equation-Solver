@@ -8,8 +8,6 @@ This application solves a linear equation involving the following operators and 
 
 Drawing an = at the end of the end of an equation is completely optional.
 
-The app can be found at [https://linear-equation-solver.herokuapp.com/](https://linear-equation-solver.herokuapp.com/)
-
 A demo window is shown below
 
 ![Demo image](Browser_demo.PNG "Demo")
