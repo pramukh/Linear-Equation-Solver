@@ -199,7 +199,7 @@ def api_predict_from_dataurl():
 
     expression = ''.join(predicted_symbols)
     try:
-        answer = expression + ' = ' + str(eval(expression))
+        answer = expression + ' = ' + str(round(eval(expression), 4))
 
     except ZeroDivisionError:
         answer = expression + ' Division by Error'
@@ -213,4 +213,4 @@ def api_predict_from_dataurl():
 if __name__ == '__main__':
     from os import environ
 
-    app.run(debug=False, port=environ.get('PORT', 5000), host='127.0.0.1')
+    app.run(debug=False, port=environ.get('PORT', 5000), host='0.0.0.0')
