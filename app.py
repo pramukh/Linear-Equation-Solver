@@ -9,6 +9,10 @@ from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from keras.models import load_model
 
+from datetime import timedelta
+from flask import make_response, request, current_app
+from functools import update_wrapper
+
 # assert 'GPU' in str(device_lib.list_local_devices())
 #
 # assert len(backend.tensorflow_backend._get_available_gpus()) > 0
@@ -176,8 +180,65 @@ def api_root():
     return app.send_static_file('index.html')
 
 
+def crossdomain(origin=None, methods=None, headers=None, max_age=21600,
+                attach_to_all=True, automatic_options=True):
+    """Decorator function that allows crossdomain requests.
+      Courtesy of
+      https://blog.skyred.fi/articles/better-crossdomain-snippet-for-flask.html
+    """
+    if methods is not None:
+        methods = ', '.join(sorted(x.upper() for x in methods))
+    # use str instead of basestring if using Python 3.x
+    if headers is not None and not isinstance(headers, list):
+        headers = ', '.join(x.upper() for x in headers)
+    # use str instead of basestring if using Python 3.x
+    if not isinstance(origin, list):
+        origin = ', '.join(origin)
+    if isinstance(max_age, timedelta):
+        max_age = max_age.total_seconds()
+
+    def get_methods():
+        """ Determines which methods are allowed
+        """
+        if methods is not None:
+            return methods
+
+        options_resp = current_app.make_default_options_response()
+        return options_resp.headers['allow']
+
+    def decorator(f):
+        """The decorator function
+        """
+
+        def wrapped_function(*args, **kwargs):
+            """Caries out the actual cross domain code
+            """
+            if automatic_options and request.method == 'OPTIONS':
+                resp = current_app.make_default_options_response()
+            else:
+                resp = make_response(f(*args, **kwargs))
+            if not attach_to_all and request.method != 'OPTIONS':
+                return resp
+
+            h = resp.headers
+            h['Access-Control-Allow-Origin'] = origin
+            h['Access-Control-Allow-Methods'] = get_methods()
+            h['Access-Control-Max-Age'] = str(max_age)
+            h['Access-Control-Allow-Credentials'] = 'true'
+            h['Access-Control-Allow-Headers'] = \
+                "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+            if headers is not None:
+                h['Access-Control-Allow-Headers'] = headers
+            return resp
+
+        f.provide_automatic_options = False
+        return update_wrapper(wrapped_function, f)
+
+    return decorator
+
+
 @app.route('/post-data-url', methods=['POST'])
-@cross_origin()
+@cross_origin(origin='*')
 def api_predict_from_dataurl():
     imgstring = request.form.get('data')
 
@@ -192,7 +253,6 @@ def api_predict_from_dataurl():
         model_predictions = model.predict_classes(final_symbols)
 
     predicted_symbols = [labels[i] for i in model_predictions]
-
 
     if predicted_symbols[-1] == '=':
         predicted_symbols.pop(-1)
@@ -213,5 +273,5 @@ def api_predict_from_dataurl():
 if __name__ == '__main__':
     from os import environ
 
-    # app.run(debug=False, port=environ.get('PORT', 5000), host='0.0.0.0')
-    app.run()
+    app.run(debug=False, port=environ.get('PORT', 5000), host='0.0.0.0')
+    # app.run()
