@@ -5,7 +5,9 @@ This application solves a linear equation involving the following operators and 
 2. +, -, / or ÷, *
 3. (, )
 4. =
+
 Drawing an = at the end of the end of an equation is completely optional.
+
 The app can be found at [https://linear-equation-solver.herokuapp.com/](https://linear-equation-solver.herokuapp.com/)
 
 A demo window is shown below
