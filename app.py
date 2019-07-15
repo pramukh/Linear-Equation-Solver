@@ -6,7 +6,7 @@ import cv2 as cv
 import numpy as np
 import tensorflow as tf
 from flask import Flask, request
-from flask_cors import CORS, cross_origin
+# from flask_cors import CORS, cross_origin
 from keras.models import load_model
 
 # assert 'GPU' in str(device_lib.list_local_devices())
@@ -28,7 +28,7 @@ labels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '*',
 app = Flask(__name__, static_url_path='/static')
 # app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
-cors = CORS(app)
+# cors = CORS(app)
 
 graph = tf.get_default_graph()
 
@@ -177,7 +177,7 @@ def api_root():
 
 
 @app.route('/post-data-url', methods=['POST'])
-@cross_origin()
+# @cross_origin()
 def api_predict_from_dataurl():
     imgstring = request.form.get('data')
 
